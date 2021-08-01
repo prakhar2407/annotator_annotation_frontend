@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "./AdminSignin.css";
 import { useHistory } from "react-router-dom";
 import { Navbar, Nav } from "react-bootstrap";
@@ -8,11 +8,10 @@ function AdminLogin() {
   const history = useHistory();
 
   const [state, setstate] = useState({
-    search: "",
     username: "",
     password: "",
-    checkbox: "",
   });
+  const form = useRef(null);
 
   function handleInputs(events) {
     const { name, value } = events.target;
@@ -24,46 +23,40 @@ function AdminLogin() {
     });
   }
 
-  async function searchData(event) {
-    event.preventDefault();
-    console.log("searchData Called");
-    const { search } = state;
-    const res = await fetch("", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        search: search,
-      }),
-    });
+  // async function searchData(event) {
+  //   event.preventDefault();
+  //   console.log("searchData Called");
+  //   const { search } = state;
+  //   const res = await fetch("", {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       search: search,
+  //     }),
+  //   });
 
-    const dataReceived = await res.json();
-    if (res.status === 404 || !dataReceived) {
-      window.alert("No Data found");
-    } else {
-      window.alert("Data Received successfully");
-    }
+  //   const dataReceived = await res.json();
+  //   if (res.status === 404 || !dataReceived) {
+  //     window.alert("No Data found");
+  //   } else {
+  //     window.alert("Data Received successfully");
+  //   }
 
-    module.exports = dataReceived;
-  }
+  //   module.exports = dataReceived;
+  // }
 
   async function postData(event) {
     event.preventDefault();
     console.log("postData Called");
-    const { username, password, checkbox } = state;
-
+    const data = new FormData(form.current);
     const res = await fetch("", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-        checkbox: checkbox,
-      }),
-    });
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((json) => setstate(json.state));
 
     const dataReceived = await res.json();
     if (res.status === 400 || !dataReceived) {
@@ -125,7 +118,7 @@ function AdminLogin() {
             />
             <button
               className="btn btn-outline-success my-2 my-sm-0"
-              onClick={searchData}
+              // onClick={searchData}
               type="submit"
             >
               Search

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "./HomePage.css";
 import { useHistory } from "react-router-dom";
 import Header from "../Header/Header";
@@ -12,6 +12,7 @@ function HomePage() {
     title: "",
     description: "",
   });
+  const form = useRef(null);
 
   function handleInputs(events) {
     const { name, value } = events.target;
@@ -44,18 +45,14 @@ function HomePage() {
 
   async function postData(event) {
     event.preventDefault();
-    const { title, description } = data;
+    const data2 = new FormData(form.current);
 
     const res = await fetch("", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: title,
-        description: description,
-      }),
-    });
+      body: data2,
+    })
+      .then((res) => res.json())
+      .then((json) => setData(json.data));
 
     const dataReceived = await res.json();
     console.log(dataReceived.status);
